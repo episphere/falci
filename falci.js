@@ -19,7 +19,7 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     tb0.align='center'
     tb0.id="TMtb"
     div.appendChild(tb0)
-    tb0.innerHTML=`<tr><td>TM2</td><td>(...)</td><td>TM9</td></tr>
+    tb0.innerHTML=`<tr><td>TM2 (#1=aa pos 90)</td><td>(...)</td><td>TM9 (#${TM2n+1}=aa pos 343)</td></tr>
                    <tr><td id="TM2td"></td><td id="poretd"></td><td id="TM9td"></td></tr>`
     let TM2tb = document.createElement('table')
     let TM9tb = document.createElement('table')
@@ -29,7 +29,7 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     let TMhtml=(i0,n)=>{
         let h = ''
         for(var i=i0;i<=n;i++){
-            h+=`<tr><td id="TMi_${i}" class="aatd">${i}</td></tr>`
+            h+=`<tr><td id="TMi_${i}" class="aatd"><sup>${i} </sup</td></tr>`
         }
         //console.log(h)
         return h
@@ -41,16 +41,18 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     let aa=["A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
     let aaAbr=["Ala","Arg","Asn","Asp","Cys","Gln","Glu","Gly","His","Ile","Leu","Lys","Met","Phe","Pro","Ser","Thr","Trp","Tyr","Val"]
     let aaName=["Alanine","Arginine","Asparagine","Aspartic acid","Cysteine","Glutamine","Glutamic acid","Glycine","Histidine","Isoleucine","Leucine","Lysine","Methionine","Phenylalanine","Proline","Serine","Threonine","Tryptophan","Tyrosine","Valine"]
-
-    document.body.querySelectorAll('.aatd').forEach(td=>{
+    let wildType=["S", "F", "V", "T", "S", "E", "T", "H", "N", "F", "I", "C", "M", "I", "M", "F", "F", "I", "V", "Y", "S", "L", "F", "M", "T", "Y", "T", "I", "V", "S", "C", "I", "Q", "G", "P", "A", "L", "A", "I", "A"]
+    document.body.querySelectorAll('.aatd').forEach((td,j)=>{
         let sel = document.createElement('select')
         aa.forEach((a,i)=>{
             let op = document.createElement('option')
             sel.appendChild(op)
-            op.value=i
+            op.value=a
             op.text=`${a} (${aaAbr[i]})`
         })
+        sel.value=wildType[j]
         td.appendChild(sel)
+
     })
 }
 
