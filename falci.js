@@ -44,8 +44,12 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
 
     document.body.querySelectorAll('.aatd').forEach(td=>{
         let sel = document.createElement('select')
-        aa.forEach=(a=>{
-            debugger
+        aa.forEach((a,i)=>{
+            let op = document.createElement('option')
+            sel.appendChild(op)
+            op.value=i
+            op.text=a
+            4
         })
         td.appendChild(sel)
     })
