@@ -49,6 +49,7 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
             sel.appendChild(op)
             op.value=a
             op.text=`${a} (${aaAbr[i]})`
+            if(op.value==wildType[j]){op.text+='*'}
         })
         sel.value=wildType[j]
         td.appendChild(sel)
