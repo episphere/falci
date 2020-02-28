@@ -42,7 +42,13 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     let aaAbr=["Ala","Arg","Asn","Asp","Cys","Gln","Glu","Gly","His","Ile","Leu","Lys","Met","Phe","Pro","Ser","Thr","Trp","Tyr","Val"]
     let aaName=["Alanine","Arginine","Asparagine","Aspartic acid","Cysteine","Glutamine","Glutamic acid","Glycine","Histidine","Isoleucine","Leucine","Lysine","Methionine","Phenylalanine","Proline","Serine","Threonine","Tryptophan","Tyrosine","Valine"]
 
-    aatds = document.body.querySelectorAll('.aatd')
+    document.body.querySelectorAll('.aatd').forEach(td=>{
+        let sel = document.createElement('select')
+        aa.forEach=(a=>{
+            debugger
+        })
+        td.appendChild(sel)
+    })
 }
 
 
