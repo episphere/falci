@@ -48,8 +48,7 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
             let op = document.createElement('option')
             sel.appendChild(op)
             op.value=i
-            op.text=a
-            4
+            op.text=`${a} (${aaAbr[i]})`
         })
         td.appendChild(sel)
     })
