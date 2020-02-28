@@ -19,8 +19,8 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     tb0.align='center'
     tb0.id="TMtb"
     div.appendChild(tb0)
-    tb0.innerHTML=`<tr><td>TM2 (#1=aa pos 90)</td><td>(...)</td><td>TM9 (#${TM2n+1}=aa pos 343)</td></tr>
-                   <tr><td id="TM2td"></td><td id="poretd"></td><td id="TM9td"></td></tr>`
+    tb0.innerHTML=`<tr><td align="center">TM2</td><td><i style="color:blue">* wild type</i></td><td align="center">TM9</td></tr>
+                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"></td><td id="TM9td" style="background-color:silver"></td></tr>`
     let TM2tb = document.createElement('table')
     let TM9tb = document.createElement('table')
     TM2td.appendChild(TM2tb)
@@ -29,7 +29,12 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     let TMhtml=(i0,n)=>{
         let h = ''
         for(var i=i0;i<=n;i++){
-            h+=`<tr><td id="TMi_${i}" class="aatd"><sup>${i} </sup</td></tr>`
+            if(i<=23){
+                j=i+89 // first pos of TM2 is 90
+            }else{
+                j=i+342-23 // first pos of TM9 is 343
+            }
+            h+=`<tr><td id="TMi_${i}" class="aatd"><sup>${j} </sup></td></tr>`
         }
         //console.log(h)
         return h
@@ -53,8 +58,31 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
         })
         sel.value=wildType[j]
         td.appendChild(sel)
-
     })
+    // look for run parameters
+    falci.runParms()
+}
+
+falci.runParms=async()=>{
+    if(location.hash.length>5){
+        let parms={}
+        location.hash.slice(1).split('&').forEach(r=>{
+            let rr=r.split('=')
+            parms[rr[0]]=rr[1]
+            falci.parms=parms
+        })
+        if(falci.parms.refdata){
+            let txt = await(await fetch(falci.parms.refdata)).text()
+            falci.csvTab=txt.split(/\n+/g).map(r=>{
+                return r.split(',')
+            })
+            falci.pre=document.createElement('pre')
+            falci.pre.innerHTML=txt
+            falci.div.appendChild(document.createElement('hr'))
+            falci.div.appendChild(falci.pre)
+
+        }
+    }
 }
 
 
