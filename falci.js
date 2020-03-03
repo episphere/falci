@@ -93,11 +93,13 @@ falci.tf=async (div=falci.TFdiv)=>{
     // wrangle the data
     let x = tf.tensor2d(falci.csvTab.slice(1).map(r=>r.slice(1,-1)))
     let y = tf.tensor1d(falci.csvTab.slice(1).map(r=>r.slice(-1)).map(r=>parseFloat(r[0])))
-    let layer1 = tf.input({shape: x.shape})
-    let layer2 = tf.layers.dense({units: 10}).apply(layer1)
-    let layer3 = tf.layers.dense({units:6}).apply(layer2)
-    let output = tf.layers.dense({units: 1, activation: 'tanh'}).apply(layer3)
-    let model = tf.model({inputs: layer1, outputs: output} )
+//     const model = tf.sequential()
+    let layer1 = tf.layers.dense({inputShape: x.shape, units: x.shape[0]})
+    let layer2 = tf.layers.dense({units: 10})
+    let layer3 = tf.layers.dense({units:6})
+    let output = tf.layers.dense({units: 1, activation: 'tanh'})
+    const layers = [layer1, layer2, layer3, output]
+    const model = tf.sequential({layers})
     console.log(model.summary())
     model.compile({optimizer: 'sgd', loss: 'meanSquaredError'})
     const trainedModel = await model.fit(x, y, {batchSize: 10, epochs: 20})
