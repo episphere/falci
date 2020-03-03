@@ -43,13 +43,15 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     TM9tb.innerHTML=TMhtml(TM2n+1,TM2n+TM9n)
     // populate aminoacid input
 
-    let aa=["A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
+    falci.aa=["A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
+    falci.mapping = {}
     let aaAbr=["Ala","Arg","Asn","Asp","Cys","Gln","Glu","Gly","His","Ile","Leu","Lys","Met","Phe","Pro","Ser","Thr","Trp","Tyr","Val"]
     let aaName=["Alanine","Arginine","Asparagine","Aspartic acid","Cysteine","Glutamine","Glutamic acid","Glycine","Histidine","Isoleucine","Leucine","Lysine","Methionine","Phenylalanine","Proline","Serine","Threonine","Tryptophan","Tyrosine","Valine"]
     let wildType=["S", "F", "V", "T", "S", "E", "T", "H", "N", "F", "I", "C", "M", "I", "M", "F", "F", "I", "V", "Y", "S", "L", "F", "M", "T", "Y", "T", "I", "V", "S", "C", "I", "Q", "G", "P", "A", "L", "A", "I", "A"]
     document.body.querySelectorAll('.aatd').forEach((td,j)=>{
         let sel = document.createElement('select')
-        aa.forEach((a,i)=>{
+        falci.aa.forEach((a,i)=>{
+            falci.mapping[a] = i
             let op = document.createElement('option')
             sel.appendChild(op)
             op.value=a
@@ -89,21 +91,41 @@ falci.runParms=async()=>{
     }
 }
 
+const encodeLabelsToInts = (labelsList) => {
+    return labelsList.map(label => falci.mapping[label])
+}
+
+const oneHotEncodeRow = (row) => {
+    const convertedLabels = encodeLabelsToInts(row)
+    const oneHotEncodedRow = tf.oneHot(convertedLabels, falci.aa.length)
+    return oneHotEncodedRow
+}
+
+const onEpochEnd = (epoch, logs) => {
+    console.log(`Logs after epoch ${epoch}`, logs)
+}
+const onTrainEnd = (logs) => {
+    console.log(`Finished training. Logs:`, logs)
+}
+
 falci.tf=async (div=falci.TFdiv)=>{
     // wrangle the data
-    let x = tf.tensor2d(falci.csvTab.slice(1).map(r=>r.slice(1,-1)))
+    const unencodedTrainingData = falci.csvTab.slice(1).map(r=>r.slice(1,-1))
+    let encodedTrainingData = unencodedTrainingData.map(oneHotEncodeRow)
+    encodedTrainingData = tf.stack(encodedTrainingData)
+    const [numExamples, ...inputShapeForModel] =  encodedTrainingData.shape
     let y = tf.tensor1d(falci.csvTab.slice(1).map(r=>r.slice(-1)).map(r=>parseFloat(r[0])))
 //     const model = tf.sequential()
-    let layer1 = tf.layers.dense({inputShape: x.shape, units: x.shape[0]})
-    let layer2 = tf.layers.dense({units: 10})
-    let layer3 = tf.layers.dense({units:6})
+    let layer1 = tf.layers.dense({inputShape: inputShapeForModel, units: 20, activation: 'relu'})
+    let layer2 = tf.layers.dense({units: 10, activation: 'relu'})
+    let layer3 = tf.layers.dense({units:6, activation: 'relu'})
+    let flattenLayer = tf.layers.flatten()
     let output = tf.layers.dense({units: 1, activation: 'tanh'})
-    const layers = [layer1, layer2, layer3, output]
+    const layers = [layer1, layer2, layer3, flattenLayer, output]
     const model = tf.sequential({layers})
     console.log(model.summary())
-    model.compile({optimizer: 'sgd', loss: 'meanSquaredError'})
-    const trainedModel = await model.fit(x, y, {batchSize: 10, epochs: 20})
-    console.log("Loss after Epoch " + i + " : " + trainedModel.history);
+    model.compile({optimizer: 'sgd', loss: 'meanSquaredError', metrics: ['accuracy']})
+    const trainedModel = await model.fit(encodedTrainingData, y, {batchSize: 10, epochs: 20, callbacks: {onEpochEnd, onTrainEnd}})
 }
 
 
