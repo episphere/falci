@@ -43,13 +43,13 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
     TM9tb.innerHTML=TMhtml(TM2n+1,TM2n+TM9n)
     // populate aminoacid input
 
-    let aa=["A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
+    falci.aa=["A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
     let aaAbr=["Ala","Arg","Asn","Asp","Cys","Gln","Glu","Gly","His","Ile","Leu","Lys","Met","Phe","Pro","Ser","Thr","Trp","Tyr","Val"]
     let aaName=["Alanine","Arginine","Asparagine","Aspartic acid","Cysteine","Glutamine","Glutamic acid","Glycine","Histidine","Isoleucine","Leucine","Lysine","Methionine","Phenylalanine","Proline","Serine","Threonine","Tryptophan","Tyrosine","Valine"]
     let wildType=["S", "F", "V", "T", "S", "E", "T", "H", "N", "F", "I", "C", "M", "I", "M", "F", "F", "I", "V", "Y", "S", "L", "F", "M", "T", "Y", "T", "I", "V", "S", "C", "I", "Q", "G", "P", "A", "L", "A", "I", "A"]
     document.body.querySelectorAll('.aatd').forEach((td,j)=>{
         let sel = document.createElement('select')
-        aa.forEach((a,i)=>{
+        falci.aa.forEach((a,i)=>{
             let op = document.createElement('option')
             sel.appendChild(op)
             op.value=a
@@ -89,9 +89,26 @@ falci.runParms=async()=>{
     }
 }
 
+/*
+const encodeRow = (row) => {
+    tf.oneHot(tf.tensor1d(falci.csvTab.slice(1).map(r=>r.slice(1,-1))[0].map(val => mapping[val]), 'int32'), 20
+}
+*/
+
 falci.tf=async (div=falci.TFdiv)=>{
     // wrangle the data
-    let x = tf.tensor2d(falci.csvTab.slice(1).map(r=>r.slice(1,-1)))
+//     let x = tf.tensor2d(falci.csvTab.slice(1).map(r=>r.slice(1,-1)))
+    //let oneHotEncodedData = falci.csvTab.slice(1).map(r=>r.slice(1,-1)).map(row => tf.oneHot(tf.tensor1d(falci.csvTab.slice(1).map(r=>r.slice(1,-1))[0].map(val => mapping[val]), 'int32'), 20).print()
+    //row.map(val => mapping[val]))), 20
+    let xx=falci.csvTab.slice(1).map(x=>x.slice(1,-1))
+    let coldx=xx.map(x1=>x1.map(x2=>falci.aa.indexOf(x2)))
+    //hotx=coldx.map(x1=>x1.map(x2=>tf.oneHot(x2,20)))
+    //let hotx=coldx.map(x1=>tf.oneHot(x1,20))
+    hotx=await tf.oneHot(coldx.join().split(',').map(x=>parseInt(x)),20).array()
+//     hotx=tf.tensor3d(tf.oneHot(coldx,falci.aa.length), [760, 40, 20])
+//hotx =tf.oneHot(coldx, falci.aa.length)
+    
+    let x = tf.tensor3d(hotx)
     let y = tf.tensor1d(falci.csvTab.slice(1).map(r=>r.slice(-1)).map(r=>parseFloat(r[0])))
 //     const model = tf.sequential()
     let layer1 = tf.layers.dense({inputShape: x.shape, units: x.shape[0]})
@@ -104,6 +121,7 @@ falci.tf=async (div=falci.TFdiv)=>{
     model.compile({optimizer: 'sgd', loss: 'meanSquaredError'})
     const trainedModel = await model.fit(x, y, {batchSize: 10, epochs: 20})
     console.log("Loss after Epoch " + i + " : " + trainedModel.history);
+    
 }
 
 
