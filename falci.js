@@ -22,7 +22,7 @@ falci.ui = async (div = document.getElementById('falciDiv')) => {
   tb0.id = "TMtb"
   div.appendChild(tb0)
   tb0.innerHTML = `<tr><td align="center">TM2</td><td><i style="color:blue">* wild type</i></td><td align="center">TM9</td></tr>
-                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"></td><td id="TM9td" style="background-color:silver"></td></tr>`
+                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"><p>Drug Resistance</p><div id="NNresistanceDiv">...</div><hr><div id="ANNresistanceDiv">predicted by AI ...<br>(not developed yet)</div></td><td id="TM9td" style="background-color:silver"></td></tr>`
   let TM2tb = document.createElement('table')
   let TM9tb = document.createElement('table')
   TM2td.appendChild(TM2tb)
@@ -70,6 +70,9 @@ falci.ui = async (div = document.getElementById('falciDiv')) => {
 }
 
 falci.runParms = async () => {
+  if(location.hash==0){
+    location.hash='refdata=pedro.csv' // default demo
+  }
   if (location.hash.length > 5) {
     let parms = {}
     location.hash.slice(1).split('&').forEach(r => {
@@ -90,10 +93,16 @@ falci.runParms = async () => {
       falci.div.appendChild(document.createElement('hr'))
       falci.div.appendChild(falci.pre) // plain display of the raw reference data
       // time for Tensor flow
-      falci.tf()
+      falci.nr()
+      // falci.tf()
     }
   }
 }
+
+falci.nr=r=>{
+  //
+}
+
 
 const convertLabelsToInts = (labelsList) => labelsList.map(label => falci.mapping[label])
 
