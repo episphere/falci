@@ -22,7 +22,7 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
   tb0.id = "TMtb"
   div.appendChild(tb0)
   tb0.innerHTML = `<tr><td align="center">TM2</td><td><i style="color:blue">* wild type</i></td><td align="center">TM9</td></tr>
-                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"><p><h3 align="center">Drug Resistance</h3></p><hr><div id="NNresistanceDiv">Predicted by nearest neighbors:<br>(coming soon) </div><hr><div id="ANNresistanceDiv">predicted by AI ...<br>(not developed yet)<hr></div></td><td id="TM9td" style="background-color:silver"></td></tr>`
+                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"><p><h3 align="center">Drug Resistance</h3></p><hr><div id="NNresistanceDiv" align="center"><h4>Nearest neighbors:</h4><h4><span id="nnPredict" style="background-color:yellow">select mutations</span></h4></div><hr><div id="ANNresistanceDiv" align="center"><h4>Predicted by AI:</h4><p>(proposed)</p><hr></div></td><td id="TM9td" style="background-color:silver"></td></tr>`
   let TM2tb = document.createElement('table')
   let TM9tb = document.createElement('table')
   TM2td.appendChild(TM2tb)
@@ -80,6 +80,9 @@ falci.selChange=function(){
   }else{
     this.style.backgroundColor="yellow"
   }
+  // calculate resistance
+  nnPredict.textContent=Math.round(falci.jaccard()).toFixed(1)+' %'
+
 }
 
 falci.runParms = async () => {
@@ -98,6 +101,8 @@ falci.runParms = async () => {
       falci.csvTab = txt.split(/\n+/g).map(r => {
         return r.split(',')
       })
+      falci.x=falci.csvTab.slice(1).map(x=>x.slice(1,-1))
+      falci.y=falci.csvTab.slice(1).map(x=>parseFloat(x.slice(-1)[0]))
       falci.pre = document.createElement('pre')
       falci.pre.innerHTML = txt
       falci.div.appendChild(document.createElement('hr'))
@@ -110,5 +115,24 @@ falci.runParms = async () => {
       // falci.tf()
 //>>>>>>> Stashed changes
     }
+  }
 }
+
+falci.jaccard=q=>{
+  if(!q){ // get it from selector
+    q = [...document.querySelectorAll('select')].map(x=>x.value)
+  }
+  let dist=[] // distance
+  falci.x.map((xi,i)=>{
+    dist[i] = xi.map((xij,j)=>xij==q[j]).reduce((a,b)=>a+b)
+    //debugger
+  })
+  let closeK=[]
+  maxDist=dist.reduce((a,b)=>Math.max(a,b))
+  dist.forEach((d,i)=>{
+    if(d==maxDist){
+      closeK.push(falci.y[i])
+    }
+  })
+  return closeK.reduce((a,b)=>a+b)/closeK.length
 }
