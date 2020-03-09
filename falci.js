@@ -21,8 +21,8 @@ falci.ui=async(div=document.getElementById('falciDiv'))=>{
   tb0.align = 'center'
   tb0.id = "TMtb"
   div.appendChild(tb0)
-  tb0.innerHTML = `<tr><td align="center">TM2</td><td><i style="color:blue">* wild type</i></td><td align="center">TM9</td></tr>
-                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"><p><h3 align="center">Drug Resistance</h3></p><hr><div id="NNresistanceDiv" align="center"><h4>Nearest neighbors:</h4><h4><span id="nnPredict" style="background-color:yellow">select mutations</span></h4></div><hr><div id="ANNresistanceDiv" align="center"><h4>Predicted by AI:</h4><p>(proposed)</p><hr></div></td><td id="TM9td" style="background-color:silver"></td></tr>`
+  tb0.innerHTML = `<tr><td align="center">TM2</td><td align="center"><i style="color:blue">* wild type</i></td><td align="center">TM9</td></tr>
+                   <tr><td id="TM2td" style="background-color:silver"></td><td id="poretd"><p><h3 align="center">Drug Resistance</h3></p><hr><div id="NNresistanceDiv" align="center"><h4>Of nearest neighbors:</h4><h4><span id="nnPredict" style="background-color:yellow">select mutations</span></h4></div><hr><div id="ANNresistanceDiv" align="center"><h4>Predicted by AI:</h4><p>(proposed)</p><hr></div></td><td id="TM9td" style="background-color:silver"></td></tr>`
   let TM2tb = document.createElement('table')
   let TM9tb = document.createElement('table')
   TM2td.appendChild(TM2tb)
@@ -104,11 +104,40 @@ falci.runParms = async () => {
       falci.x=falci.csvTab.slice(1).map(x=>x.slice(1,-1))
       falci.y=falci.csvTab.slice(1).map(x=>parseFloat(x.slice(-1)[0]))
       falci.pre = document.createElement('pre')
+      falci.pre.hidden=true
       falci.pre.innerHTML = txt
       falci.div.appendChild(document.createElement('hr'))
       falci.TFdiv = document.createElement('div')
       falci.div.appendChild(falci.TFdiv)
       falci.div.appendChild(document.createElement('hr'))
+      let btShowHideRef=document.createElement('button')
+      btShowHideRef.id="btShowHideRef"
+      btShowHideRef.textContent="Show Reference Data"
+      btShowHideRef.style.backgroundColor='lime'
+      btShowHideRef.onclick=_=>{
+        if(falci.pre.hidden){
+          falci.pre.hidden=false
+          btShowHideRef.textContent="Hide Reference Data"
+          btShowHideRef.style.backgroundColor='orange'
+        }else{
+          falci.pre.hidden=true
+          btShowHideRef.textContent="Show Reference Data"
+          btShowHideRef.style.backgroundColor='lime'
+        }
+      }
+      let loadRefData=document.createElement('button')
+      loadRefData.textContent="Load Reference Data"
+      let downloadRefData=document.createElement('button')
+      downloadRefData.textContent="Download Reference Data"
+      let loadExperiments=document.createElement('button')
+      loadExperiments.textContent="Load experimental profiles"
+      falci.div.appendChild(btShowHideRef)
+      falci.div.appendChild(loadRefData)
+      falci.div.appendChild(downloadRefData)
+      falci.div.appendChild(loadExperiments)
+      loadRefData.onclick=downloadRefData.onclick=loadExperiments.onclick=function(){
+        alert(`function "${this.textContent}" not activated yet`)
+      }
       falci.div.appendChild(falci.pre) // plain display of the raw reference data
       // time for Tensor flow
       //falci.nr()
