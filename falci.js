@@ -81,7 +81,7 @@ falci.selChange=function(){
     this.style.backgroundColor="yellow"
   }
   // calculate resistance
-  nnPredict.textContent=Math.round(falci.jaccard()).toFixed(1)+' %'
+  nnPredict.textContent=`${Math.round(falci.jaccard()).toFixed(1)} % survival`
 
 }
 
@@ -109,7 +109,7 @@ falci.runParms = async () => {
       falci.div.appendChild(document.createElement('hr'))
       falci.TFdiv = document.createElement('div')
       falci.div.appendChild(falci.TFdiv)
-      falci.div.appendChild(document.createElement('hr'))
+      //falci.div.appendChild(document.createElement('hr'))
       let btShowHideRef=document.createElement('button')
       btShowHideRef.id="btShowHideRef"
       btShowHideRef.textContent="Show Reference Data"
